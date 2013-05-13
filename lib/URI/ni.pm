@@ -6,7 +6,7 @@ require URI::_punycode;
 require URI::QueryParam;
 @ISA=qw(URI::_server URI);
 
-$VERSION = '0.02';
+$VERSION = '0.03';
 
 # not sure why the module is laid out like this, oh well.
 
@@ -250,7 +250,7 @@ sub algorithm {
     my $self = shift;
     my $o = $self->path;
     return if !defined $o or $o =~ m!^/+$!;
-    $o =~ s!^/(.*?)(;.*)?$!$1!;
+    $o =~ s!^/?(.*?)(;.*)?$!$1!;
     $o;
 }
 
@@ -269,7 +269,8 @@ sub b64digest {
     my ($self, $raw) = @_;
     my $hash = $self->path;
     return if !defined $hash or $hash =~ m!^/+$!;
-    $hash =~ s!^/(?:.*?;)(.*?)(?:\?.*)?$!$1!;
+    $hash =~ s!^/?(?:.*?;)(.*?)(?:\?.*)?$!$1!;
+    return unless defined $hash;
     $hash =~ tr!-_!+/! unless $raw;
     $hash;
 }
@@ -321,67 +322,6 @@ sub locators {
     }
 
     return wantarray ? @loc : $loc[0];
-}
-
-=head2 crypto
-
-Returns the cryptography spec embedded in the C<enc> or C<menc>
-parameters. A key is kind of a weird thing to embed in a URI, but
-whatever floats your boat. As such, I have yet to implement this in
-any sane way.
-
-=cut
-
-sub crypto {
-    my ($self, $which, $new) = @_;
-    Carp::croak("Only 'enc' and 'menc' are valid values.")
-          unless $which =~ /^m?enc/i;
-
-    my ($old) = $self->query_param($which);
-    $old = URI::di::CryptoSpec->new($old) if defined $old;
-
-    if (defined $new) {
-        $new = URI::di::CryptoSpec->new($new);
-        $self->query_param(lc $which => "$new");
-        # i always thought this behaviour was weird.
-        return $old;
-    }
-
-    $old;
-}
-
-package URI::di::CryptoSpec;
-
-use overload '""' => \&as_string;
-
-sub new {
-    my ($class, $string) = @_;
-    bless \$string, $class;
-}
-
-sub cipher {
-    my $self = shift;
-    my $s = $$self;
-    $s =~ /^(.*?)(:.*)?$/;
-    $1;
-}
-
-sub key {
-    my $self = shift;
-    my $s = $$self;
-    $s =~ /^(?:[^:]+:)([^:]*?)(:.*)?$/;
-    $1;
-}
-
-sub iv {
-    my $self = shift;
-    my $s = $$self;
-    $s =~ /^(?:[^:]+:){2}(.*?)$/;
-    $1;
-}
-
-sub as_string {
-    ${$_[0]};
 }
 
 =head1 SEE ALSO

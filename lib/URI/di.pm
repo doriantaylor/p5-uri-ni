@@ -6,7 +6,7 @@ require URI::_punycode;
 require URI::QueryParam;
 @ISA=qw(URI::_query URI);
 
-$VERSION = '0.02';
+$VERSION = '0.03';
 
 # not sure why the module is laid out like this, oh well.
 

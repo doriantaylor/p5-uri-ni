@@ -1,9 +1,9 @@
 use inc::Module::Install;
 
-name     'URI-di';
+name     'URI-ni';
 abstract 
-    'Implementation of the di: URI scheme from draft-hallambaker-digesturi';
-all_from 'lib/URI/di.pm';
+    'Implementation of the ni: URI scheme from RFC 6920';
+all_from 'lib/URI/ni.pm';
 author   q{Dorian Taylor <dorian@cpan.org>};
 license  'apache';
 
