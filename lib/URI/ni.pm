@@ -6,7 +6,7 @@ require URI::_punycode;
 require URI::QueryParam;
 @ISA=qw(URI::_server URI);
 
-$VERSION = '0.03';
+$VERSION = '0.04';
 
 # not sure why the module is laid out like this, oh well.
 
@@ -208,7 +208,8 @@ sub from_digest {
         Carp::croak("Digest must be a Digest::base subclass")
               unless Scalar::Util::blessed $digest
                   and $digest->isa('Digest::base');
-        $digest = $digest->b64digest;
+        # WATCH OUT: the digest object state gets reset.
+        $digest = $digest->clone->b64digest;
     }
     else {
         utf8::downgrade($digest);
